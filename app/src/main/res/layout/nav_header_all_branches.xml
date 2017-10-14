@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/nav_header_height"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="16dp"
+            android:paddingTop="26dp"
+            android:translationZ="10dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Rabobank"
+                android:textSize="17dp"
+                android:paddingTop="10dp"
+                android:translationZ="10dp"
+                android:id="@+id/rabobankText"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:layout_below="@+id/branchImage"/>
+
+            <TextView
+                android:id="@+id/branchName"
+                android:layout_width="wrap_content"
+                android:translationZ="10dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rabobankText"
+                android:text="Branch: Wollongong" />
+
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:translationZ="10dp"
+                    android:src="@mipmap/straya"
+                    android:layout_marginTop="25dp"
+                    android:id="@+id/branchImage"
+                    android:scaleType="centerCrop"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"/>
+
+        </RelativeLayout>
+
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/header_backdrop"
+            android:scaleType="centerCrop"/>
+    </RelativeLayout>
+
+</FrameLayout>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="7.5dp"
+    android:layout_marginBottom="7.5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        android:id="@+id/relativeLayout">
+
+        <TextView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/initialHolder"
+            android:text="B"
+            android:background="@drawable/circular_textview"
+            android:textColor="#fff"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textAllCaps="true"
+            android:textSize="20dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="17dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Branch"
+            android:textSize="20dp"
+            android:textColor="#494949"
+            android:alpha="0.87"
+            android:layout_marginStart="24dp"
+            android:layout_alignBaseline="@+id/initialHolder"
+            android:layout_alignBottom="@+id/initialHolder"
+            android:layout_toEndOf="@+id/initialHolder"
+            android:id="@+id/branchName" />
+
+        <ImageView
+            android:id="@+id/continueButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="19dp"
+            app:srcCompat="@drawable/arrow"
+            android:tint="#494949"
+            android:layout_alignTop="@+id/branchName"
+            android:layout_alignParentEnd="true" />
+
+
+    </RelativeLayout>
+
+</RelativeLayout>
