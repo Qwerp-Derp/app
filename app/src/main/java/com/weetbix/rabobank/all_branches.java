@@ -2,6 +2,7 @@ package com.weetbix.rabobank;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.design.widget.NavigationView;
@@ -13,6 +14,12 @@ import android.support.v7.widget.Toolbar;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.weetbix.rabobank.branches.generate.AllBranches;
 import com.weetbix.rabobank.branches.generate.Branch;
 import com.weetbix.rabobank.branches.generate.BranchListAdapter;
@@ -20,14 +27,20 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
+import android.widget.ViewFlipper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import eu.amirs.JSON;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -35,13 +48,18 @@ import okhttp3.Response;
 
 
 
-public class all_branches extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+public class all_branches extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
+
+    private GoogleMap mMap;
 
 
     public List<Branch> Branches     = new ArrayList<Branch>();
     public BranchListAdapter adapter = new BranchListAdapter(Branches);
     public FloatingSearchView searchBar;
     public RecyclerView recycler;
+    public ViewFlipper flipper;
+    public Boolean mapLoaded = false;
     public String flag = "inactive";
 
 
@@ -63,32 +81,15 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
 
 
         updateUI = new Handler();
+        // Get the viewflipper
+        flipper = (ViewFlipper) findViewById(R.id.flipper);
 
 
         // Just for testing purposes.... In reality it would be populated with actual branches
-        Branches.add(new Branch("Test"));
-        Branches.add(new Branch("Washington"));
-        Branches.add(new Branch("Washington"));
-        Branches.add(new Branch("Washington"));
-        Branches.add(new Branch("Washington"));
-        Branches.add(new Branch("Sydney"));
-        Branches.add(new Branch("Wagga Wagga"));
-        Branches.add(new Branch("Varun"));
-        Branches.add(new Branch("Germany"));
-        Branches.add(new Branch("Turramurra"));
-        Branches.add(new Branch("Berlin"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
-        Branches.add(new Branch("Hurstvile"));
+        Branches.add(new Branch("Sydney", "Australia", "201 Sussex Street Level 16 Darling Park Tower 3", new double[]{-33.8727494, 151.2028492}));
+        Branches.add(new Branch("Forbes", "Australia", "16 Sherriff Street Forbes NSW 2871", new double[]{-30.5163687, 151.6704295}));
+        Branches.add(new Branch("Geraldton", "Australia", "Unit 1, 11 Wiebbe Hayes Lane Geraldton WA 6530", new double[]{-33.3855852, 148.0105879}));
+        Branches.add(new Branch("Armidale", "Australia", "84 Rusden Street Armidale NSW 2350", new double[]{-28.7669204, 114.612941}));
 
 
 
@@ -121,6 +122,13 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
         recycler.setItemAnimator(new SlideInUpAnimator());
 
 
+
+
+
+
+
+
+
         AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
 
 
@@ -131,6 +139,8 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
         bottomNavigation.addItem(listSearch);
         bottomNavigation.addItem(mapSearch);
 
+
+
         // Set the current item
         bottomNavigation.setCurrentItem(0);
         bottomNavigation.setAccentColor(R.color.secondary);
@@ -140,42 +150,66 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
 
 
 
+        // Add a listener for the navbar
+        bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
+            @Override
+            public boolean onTabSelected(int position, boolean wasSelected) {
+                // This means that the map search was clicked and wasnt already clicked
+                if ((position == 1) && !wasSelected) {
+                    flipper.setDisplayedChild(1);
+                } else if ((position == 0) && !wasSelected) {
+                    flipper.setDisplayedChild(0);
+                }
+                return true;
+            }
+        });
 
-        // Need to make sure that the search bar appears when recycler view is scrolled
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Need to make sure that the search bar appears and disappears when recycler view is scrolled
         recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            Boolean scrollingDown = false;
+
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
+                // Determine the scroll state
+                if (((newState == RecyclerView.SCROLL_STATE_IDLE) && scrollingDown) || scrollingDown) {
+                    searchBar.animate()
+                            .setDuration(400)
+                            .setInterpolator(new DecelerateInterpolator())
+                            .translationY(-1000)
+                            .setStartDelay(0)
+                            .start();
+                } else {
+                    searchBar.animate()
+                            .setDuration(400)
+                            .setInterpolator(new AccelerateInterpolator())
+                            .translationY(0)
+                            .setStartDelay(0)
+                            .start();
+                }
+            }
 
-                // Check that we are not at the top first
-                if (!(recycler.getLayoutManager().findViewByPosition(0) == recyclerView.getChildAt(0))) {
-                    // Check scrollstate
-                    if ((newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) && flag.equals("inactive")) {
-
-                        updateUI.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Animation animation = AnimationUtils.loadAnimation(all_branches.this, R.anim.slide_in_the_dms);
-                                animation.setInterpolator(new AccelerateDecelerateInterpolator());
-                                searchBar.startAnimation(animation);
-                            }
-                        });
-                        flag = "active";
-
-                    } else if (flag.equals("active")) {
-
-                        // Reopen bar
-                        updateUI.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Animation animation = AnimationUtils.loadAnimation(all_branches.this, R.anim.slide_out_the_dms);
-                                animation.setInterpolator(new AccelerateDecelerateInterpolator());
-                                searchBar.startAnimation(animation);
-                            }
-                        });
-                        flag = "inactive";
-
-                    }
+            // Determine scroll state
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) {
+                    scrollingDown = true;
+                } else {
+                    scrollingDown = false;
                 }
             }
         });
@@ -240,6 +274,15 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
 
 
 
+        // The rest of this class is dedicated to the images
+
+
+        // Set up the map for our second layout.... Do this at the end
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
 
 
     }
@@ -271,6 +314,38 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
         httpThread.start();
     }
 
+
+    public String sendGet(String url) throws IOException {
+        final String[] response = new String[1];
+        final String query = url;
+
+        Thread httpThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client = new OkHttpClient();
+
+                Request request = new Request.Builder()
+                        .url(query)
+                        .build();
+
+                Response resp = null;
+                try {
+                    resp = client.newCall(request).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    response[0] = resp.body().string();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+        httpThread.start();
+
+        return response[0];
+    }
 
     @Override
     public void onBackPressed() {
@@ -327,5 +402,21 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+
+
+
+    // On Map ready for google maps
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Iterate through list
+        for(final Branch curr: Branches) {
+            mMap.addMarker(new MarkerOptions().position(new LatLng(curr.latLng[0], curr.latLng[1])).title(curr.name));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(25.2744 ,133.7751)));
+        }
     }
 }

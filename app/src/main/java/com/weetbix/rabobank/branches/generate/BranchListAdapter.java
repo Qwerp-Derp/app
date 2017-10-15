@@ -25,12 +25,14 @@ public class BranchListAdapter extends RecyclerView.Adapter<BranchListAdapter.br
         public TextView initialHolder;
         public TextView branchName;
         public ImageView continueButton;
+        public TextView countryName;
 
         public branch_holder(View itemView) {
             super(itemView);
             initialHolder = (TextView) itemView.findViewById(R.id.initialHolder);
             branchName = (TextView) itemView.findViewById(R.id.branchName);
             continueButton = (ImageView) itemView.findViewById(R.id.continueButton);
+            countryName = (TextView) itemView.findViewById(R.id.country);
         }
     }
 
@@ -64,6 +66,7 @@ public class BranchListAdapter extends RecyclerView.Adapter<BranchListAdapter.br
         Branch branch = branches.get(position);
         holder.initialHolder.setText(new String(new char[]{branch.name.charAt(0)}));
         holder.branchName.setText(branch.name);
+        holder.countryName.setText(branch.country);
     }
 
     @Override
