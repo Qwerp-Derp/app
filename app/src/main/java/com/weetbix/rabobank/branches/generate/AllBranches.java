@@ -1,11 +1,7 @@
-package com.varun.edwin.hanyuan.trent.rabobank.branches.generate;
+package com.weetbix.rabobank.branches.generate;
 
 import android.content.Context;
-import android.support.annotation.Dimension;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-
-import com.varun.edwin.hanyuan.trent.rabobank.R;
 
 import java.util.ArrayList;
 import java.util.List;

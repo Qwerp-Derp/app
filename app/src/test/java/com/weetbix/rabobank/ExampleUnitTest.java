@@ -1,4 +1,4 @@
-package com.varun.edwin.hanyuan.trent.rabobank;
+package com.weetbix.rabobank;
 
 import org.junit.Test;
 

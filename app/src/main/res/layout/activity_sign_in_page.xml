@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.varun.edwin.hanyuan.trent.rabobank.sign_in_page">
+    tools:context="com.weetbix.rabobank.sign_in_page">
 
 
 

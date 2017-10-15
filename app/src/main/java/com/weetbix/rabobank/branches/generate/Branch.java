@@ -1,4 +1,4 @@
-package com.varun.edwin.hanyuan.trent.rabobank.branches.generate;
+package com.weetbix.rabobank.branches.generate;
 
 /**
  * Created by varun on 13/10/2017.

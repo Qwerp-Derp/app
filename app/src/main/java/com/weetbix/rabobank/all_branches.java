@@ -1,8 +1,7 @@
-package com.varun.edwin.hanyuan.trent.rabobank;
+package com.weetbix.rabobank;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.design.widget.NavigationView;
@@ -14,9 +13,9 @@ import android.support.v7.widget.Toolbar;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
-import com.varun.edwin.hanyuan.trent.rabobank.branches.generate.AllBranches;
-import com.varun.edwin.hanyuan.trent.rabobank.branches.generate.Branch;
-import com.varun.edwin.hanyuan.trent.rabobank.branches.generate.BranchListAdapter;
+import com.weetbix.rabobank.branches.generate.AllBranches;
+import com.weetbix.rabobank.branches.generate.Branch;
+import com.weetbix.rabobank.branches.generate.BranchListAdapter;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;

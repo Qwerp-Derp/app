@@ -1,4 +1,4 @@
-package com.varun.edwin.hanyuan.trent.rabobank;
+package com.weetbix.rabobank;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

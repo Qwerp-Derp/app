@@ -1,4 +1,4 @@
-package com.varun.edwin.hanyuan.trent.rabobank.branches.generate;
+package com.weetbix.rabobank.branches.generate;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;

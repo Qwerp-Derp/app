@@ -1,4 +1,4 @@
-package com.varun.edwin.hanyuan.trent.rabobank;
+package com.weetbix.rabobank;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

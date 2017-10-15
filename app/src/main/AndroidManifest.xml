@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.varun.edwin.hanyuan.trent.rabobank">
+    package="com.weetbix.rabobank">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".all_branches"
+            android:name="com.weetbix.rabobank.all_branches"
             android:theme="@style/AppTheme"
             android:label="All Branches">
             <intent-filter>
@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".sign_in_page"></activity>
+        <activity android:name="com.weetbix.rabobank.sign_in_page"></activity>
     </application>
 
 </manifest>
