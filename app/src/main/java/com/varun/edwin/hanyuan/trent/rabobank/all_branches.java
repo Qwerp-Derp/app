@@ -2,6 +2,7 @@ package com.varun.edwin.hanyuan.trent.rabobank;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.design.widget.NavigationView;
@@ -10,41 +11,47 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
 import com.arlib.floatingsearchview.FloatingSearchView;
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.varun.edwin.hanyuan.trent.rabobank.branches.generate.AllBranches;
 import com.varun.edwin.hanyuan.trent.rabobank.branches.generate.Branch;
 import com.varun.edwin.hanyuan.trent.rabobank.branches.generate.BranchListAdapter;
-
-
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
-import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 
-public class all_branches extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+
+public class all_branches extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
-    RecyclerView recycler;
-    // I have to do this becuase java is the most austistic language ever
-    public static String flag = "inactive";
-    public List<Branch> Branches = new ArrayList<Branch>();
-    public FloatingSearchView searchBar;
+    public List<Branch> Branches     = new ArrayList<Branch>();
     public BranchListAdapter adapter = new BranchListAdapter(Branches);
+    public FloatingSearchView searchBar;
+    public RecyclerView recycler;
+    public String flag = "inactive";
+
+
+
+    // Handlers for updating the UI
+    // Removes stress on the main thread
+    public Handler updateUI;
+
+
 
 
 
@@ -54,9 +61,12 @@ public class all_branches extends AppCompatActivity
         setContentView(R.layout.activity_all_branches);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitleTextColor(Color.BLACK);
 
-        // Just for testing purposes
+
+        updateUI = new Handler();
+
+
+        // Just for testing purposes.... In reality it would be populated with actual branches
         Branches.add(new Branch("Test"));
         Branches.add(new Branch("Washington"));
         Branches.add(new Branch("Washington"));
@@ -92,9 +102,17 @@ public class all_branches extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
+
+
+        // Get the search view
+        searchBar = (FloatingSearchView) findViewById(R.id.floating_search_view);
+
+
+        // Load the recycler
         // Attain recycler and set layout manager
+        LinearLayoutManager llm   = new LinearLayoutManager(all_branches.this);
         recycler = (RecyclerView) findViewById(R.id.recycler);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recycler.setLayoutManager(llm);
         // Load layout into it
@@ -103,8 +121,25 @@ public class all_branches extends AppCompatActivity
         // Add some fancy animations
         recycler.setItemAnimator(new SlideInUpAnimator());
 
-        // Get the search view
-        searchBar = (FloatingSearchView) findViewById(R.id.floating_search_view);
+
+        AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
+
+
+        // Stuff relating to the bottom nav drawer
+        AHBottomNavigationItem listSearch = new AHBottomNavigationItem("List Search", R.drawable.list_search_icon);
+        AHBottomNavigationItem mapSearch = new AHBottomNavigationItem("Map Search", R.drawable.map_search_icon);
+        // Add it
+        bottomNavigation.addItem(listSearch);
+        bottomNavigation.addItem(mapSearch);
+
+        // Set the current item
+        bottomNavigation.setCurrentItem(0);
+        bottomNavigation.setAccentColor(R.color.secondary);
+        bottomNavigation.setDefaultBackgroundColor(Color.WHITE);
+        bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
+        bottomNavigation.setInactiveColor(Color.parseColor("#adadad"));
+
+
 
 
         // Need to make sure that the search bar appears when recycler view is scrolled
@@ -118,18 +153,27 @@ public class all_branches extends AppCompatActivity
                     // Check scrollstate
                     if ((newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) && flag.equals("inactive")) {
 
-                        // Perform action depending on scrollstate
-                        Animation animation = AnimationUtils.loadAnimation(all_branches.this, R.anim.slide_in_the_dms);
-                        animation.setInterpolator(new AccelerateDecelerateInterpolator());
-                        searchBar.startAnimation(animation);
+                        updateUI.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Animation animation = AnimationUtils.loadAnimation(all_branches.this, R.anim.slide_in_the_dms);
+                                animation.setInterpolator(new AccelerateDecelerateInterpolator());
+                                searchBar.startAnimation(animation);
+                            }
+                        });
                         flag = "active";
 
                     } else if (flag.equals("active")) {
 
                         // Reopen bar
-                        Animation animation = AnimationUtils.loadAnimation(all_branches.this, R.anim.slide_out_the_dms);
-                        animation.setInterpolator(new AccelerateDecelerateInterpolator());
-                        searchBar.startAnimation(animation);
+                        updateUI.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Animation animation = AnimationUtils.loadAnimation(all_branches.this, R.anim.slide_out_the_dms);
+                                animation.setInterpolator(new AccelerateDecelerateInterpolator());
+                                searchBar.startAnimation(animation);
+                            }
+                        });
                         flag = "inactive";
 
                     }
@@ -141,38 +185,93 @@ public class all_branches extends AppCompatActivity
 
 
 
+
+
+
         // Handle Searches
         searchBar.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
             @Override
             public void onSearchTextChanged(String oldQuery, String newQuery) {
                 // Filter views
+                final String query = newQuery;
 
-                if (newQuery.length() != 0) {
-                    // Iterate and filter
-                    List<Branch> newList = new ArrayList<Branch>();
-                    for (Branch curr : Branches) {
-                        // Check that it contains the query
-                        if (curr.name.startsWith(newQuery.toLowerCase().substring(0, 1).toUpperCase() + newQuery.substring(1))) {
-                            // Append
-                            newList.add(curr);
+
+                // Thread for searching
+                Thread search = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (query.length() != 0) {
+                            // Iterate and filter
+                            List<Branch> newList = new ArrayList<Branch>();
+                            for (Branch curr : Branches) {
+                                // Check that it contains the query
+                                if (curr.name.startsWith(query.toLowerCase().substring(0, 1).toUpperCase() + query.substring(1))) {
+                                    // Append
+                                    newList.add(curr);
+                                }
+                            }
+
+                            final List<Branch> createdList = newList;
+                            // Alter data
+                            updateUI.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.setData(createdList);
+                                    adapter.notifyDataSetChanged();
+                                }
+                            });
+
+
+
+                        } else {
+                            updateUI.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.setData(Branches);
+                                    adapter.notifyDataSetChanged();
+                                }
+                            });
                         }
                     }
+                });
+                search.start();
 
-                    // Alter data
-                    adapter.setData(newList);
-                    adapter.notifyDataSetChanged();
-
-
-                } else {
-                    adapter.setData(Branches);
-                    adapter.notifyDataSetChanged();
-                }
             }
         });
 
 
 
+
+
     }
+
+
+    public void getBranches() throws IOException {
+        Thread httpThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client = new OkHttpClient();
+
+                Request request = new Request.Builder()
+                        .url("https://www.rabobank.com.au/branch/")
+                        .build();
+
+                Response response = null;
+                try {
+                    response = client.newCall(request).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    Log.d("Response", response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        httpThread.start();
+    }
+
 
     @Override
     public void onBackPressed() {

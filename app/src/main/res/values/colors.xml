@@ -6,4 +6,5 @@
 
     <color name="primary">#FF5500</color>
     <color name="secondary">#4632A4</color>
+    <color name="white">#fff</color>
 </resources>
