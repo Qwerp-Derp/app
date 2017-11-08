@@ -2,6 +2,7 @@ package com.weetbix.rabobank;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import com.arlib.floatingsearchview.FloatingSearchView;
+import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter;
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,6 +37,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import java.io.IOException;
@@ -57,6 +62,7 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
     public List<Branch> Branches     = new ArrayList<Branch>();
     public BranchListAdapter adapter = new BranchListAdapter(Branches);
     public FloatingSearchView searchBar;
+    public FloatingSearchView searchBarMap;
     public RecyclerView recycler;
     public ViewFlipper flipper;
     public Boolean mapLoaded = false;
@@ -67,8 +73,6 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
     // Handlers for updating the UI
     // Removes stress on the main thread
     public Handler updateUI;
-
-
 
 
 
@@ -85,11 +89,33 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
         flipper = (ViewFlipper) findViewById(R.id.flipper);
 
 
-        // Just for testing purposes.... In reality it would be populated with actual branches
-        Branches.add(new Branch("Sydney", "Australia", "201 Sussex Street Level 16 Darling Park Tower 3", new double[]{-33.8727494, 151.2028492}));
-        Branches.add(new Branch("Forbes", "Australia", "16 Sherriff Street Forbes NSW 2871", new double[]{-30.5163687, 151.6704295}));
-        Branches.add(new Branch("Geraldton", "Australia", "Unit 1, 11 Wiebbe Hayes Lane Geraldton WA 6530", new double[]{-33.3855852, 148.0105879}));
-        Branches.add(new Branch("Armidale", "Australia", "84 Rusden Street Armidale NSW 2350", new double[]{-28.7669204, 114.612941}));
+
+
+
+
+        // Load the branches through a http req
+        // Ideally this will change to an actual domain name on a vps and not hosted locally
+        try {
+            String res = sendGet("http://10.0.2.2:8080/branches/get");
+            // Parse the json
+            JSON json = new JSON(res);
+            // Begin reading it
+            for (int i = 0; i < json.count(); i++) {
+                // Branch at index i
+                JSON branch = json.index(i);
+                // Create the branch
+                double[] latlng = new double[]{branch.key("Lat").doubleValue(), branch.key("Lng").doubleValue()};
+                Branches.add(new Branch(branch.key("Name").stringValue(), branch.key("Country").stringValue(), branch.key("Addr").stringValue(), latlng, branch.key("ID").intValue()));
+            }
+
+            Log.d("Result", res);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
 
 
 
@@ -274,7 +300,14 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
 
 
 
-        // The rest of this class is dedicated to the images
+
+
+
+
+
+
+
+        // The rest of this class is dedicated to the maps
 
 
         // Set up the map for our second layout.... Do this at the end
@@ -285,34 +318,148 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
 
 
 
-    }
+        searchBarMap = (FloatingSearchView) findViewById(R.id.floating_search_view_maps);
 
 
-    public void getBranches() throws IOException {
-        Thread httpThread = new Thread(new Runnable() {
+
+
+        // Create click handler for the suggestions
+
+        searchBarMap.setOnBindSuggestionCallback(new SearchSuggestionsAdapter.OnBindSuggestionCallback() {
             @Override
-            public void run() {
-                OkHttpClient client = new OkHttpClient();
+            public void onBindSuggestion(View suggestionView, ImageView leftIcon, TextView textView, final SearchSuggestion item, int itemPosition) {
+                final SearchSuggestion temp = item;
+                suggestionView.setOnClickListener(new View.OnClickListener() {
+                    SearchSuggestion suggestion = item;
+                    @Override
+                    public void onClick(View v) {
+                        // Clear the map
+                        mMap.clear();
+                        // Get the branch
+                        Branch clicked = Branches.get(suggestion.describeContents());
+                        // Load the tag into the map
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(clicked.latLng[0], clicked.latLng[1])).title(clicked.name));
+                        searchBarMap.clearSearchFocus();
+                    }
+                });
+            }
+        });
 
-                Request request = new Request.Builder()
-                        .url("https://www.rabobank.com.au/branch/")
-                        .build();
 
-                Response response = null;
-                try {
-                    response = client.newCall(request).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    Log.d("Response", response.body().string());
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+
+
+
+
+
+
+        // Search shit for the map
+        // Attain the map
+        searchBarMap = (FloatingSearchView) findViewById(R.id.floating_search_view_maps);
+        // Load the default suggestions
+        final List<SearchSuggestion> suggestions = new ArrayList<SearchSuggestion>();
+
+        // Iterate over branches
+        for (int i = 0; i < 7; i++) {
+            // Check that it exists if not the close the loop
+            try {
+                final Branch curr = Branches.get(i);
+                // Add a new suggestion
+                suggestions.add(new SearchSuggestion() {
+                    // Just the library stuff
+                    @Override
+                    public String getBody() {
+                        return curr.name;
+                    }
+
+                    @Override
+                    public int describeContents() {
+                        return 0;
+                    }
+
+                    public double[] getCoords() {
+                        return curr.latLng;
+                    }
+
+                    @Override
+                    public void writeToParcel(Parcel dest, int flags) {
+                        dest.writeString(curr.name);
+                        dest.writeInt(1);
+                    }
+                });
+            } catch (Exception e) {
+                break;
+            }
+        }
+
+
+
+
+
+
+
+        // Create a search listener
+        // Andddddd................... that is search completed
+        searchBarMap.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+            @Override
+            public void onSearchTextChanged(String oldQuery, String newQuery) {
+                // Determine the length of the query
+                // First get the query
+                if (newQuery.length() == 0) {
+                    // Push the suggestions
+                    searchBarMap.swapSuggestions(suggestions);
+                } else {
+                    List<SearchSuggestion> suggestionList = new ArrayList<SearchSuggestion>();
+                    // Iterate
+                    for (int i = 0; i < Branches.size(); i++) {
+                        final int index = i;
+                        final Branch curr = Branches.get(i);
+                        if (curr.name.startsWith(newQuery.toLowerCase().substring(0, 1).toUpperCase() + newQuery.substring(1))) {
+                            suggestionList.add(new SearchSuggestion() {
+                                @Override
+                                public String getBody() {
+                                    return curr.name;
+                                }
+
+                                @Override
+                                public int describeContents() {
+                                    return index;
+                                }
+
+                                @Override
+                                public void writeToParcel(Parcel dest, int flags) {
+                                    dest.writeString(curr.name);
+                                    dest.writeInt(1);
+                                }
+                            });
+                        }
+                    }
+                    searchBarMap.swapSuggestions(suggestionList);
                 }
             }
         });
-        httpThread.start();
+
+
+
+
+
+
+
+
+
+
     }
+
+
+
+
+
+
+
+
+
+
+
 
 
     public String sendGet(String url) throws IOException {
@@ -343,6 +490,7 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
 
         });
         httpThread.start();
+
 
         return response[0];
     }
@@ -416,7 +564,8 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
         // Iterate through list
         for(final Branch curr: Branches) {
             mMap.addMarker(new MarkerOptions().position(new LatLng(curr.latLng[0], curr.latLng[1])).title(curr.name));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(25.2744 ,133.7751)));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(-25.2744, 133.7751)));
+            mMap.setMinZoomPreference(3.0f);
         }
     }
 }

@@ -63,15 +63,362 @@
                 android:layout_height="match_parent"
                 tools:context="com.weetbix.rabobank.dsa" />
 
+            <com.arlib.floatingsearchview.FloatingSearchView
+                android:id="@+id/floating_search_view_maps"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:floatingSearch_voiceRecHint="Say something!"
+                app:floatingSearch_showVoiceInput="true"
+                app:floatingSearch_dimBackground="false"
+                app:floatingSearch_backgroundColor="#FAFAFA"
+                app:floatingSearch_dismissOnOutsideTouch="true"
+                app:floatingSearch_suggestionsListAnimDuration="50"
+                app:floatingSearch_showSearchKey="true"
+                app:floatingSearch_searchBarMarginLeft="10dp"
+                app:floatingSearch_searchBarMarginRight="10dp"
+                app:floatingSearch_searchBarMarginTop="20dp"
+                app:floatingSearch_leftActionMode="showSearch"
+                app:floatingSearch_dismissFocusOnItemSelection="true"
+                app:floatingSearch_close_search_on_keyboard_dismiss="true"/>
+
         </RelativeLayout>
     </ViewFlipper>
 
 
-    <FrameLayout
-        android:id="@+id/frame"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        android:visibility="gone"
+        android:id="@+id/overlay">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000"
+            android:alpha="0.7" />
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:cardCornerRadius="20dp"
+            android:layout_marginTop="40dp"
+            android:background="#cccccc"
+            android:layout_marginBottom="40dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:alpha="1">
+
+
+            <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:id="@+id/textholders"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:src="@mipmap/header_backdrop"
+                            android:background="@drawable/circular_textview"
+                            android:clickable="true"
+                            android:layout_gravity="top|left"
+                            android:layout_marginTop="50dp"
+                            android:layout_marginLeft="30dp"
+                            android:id="@+id/branchImage"
+                            android:scaleType="centerCrop"/>
+
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_margin="15dp"
+                            android:layout_toRightOf="@+id/branchImage">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Branch Name"
+                                android:id="@+id/branch_name_viewer"
+                                android:layout_centerVertical="true"
+                                android:textSize="22dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/country_name_viewer"
+                                android:layout_below="@+id/branch_name_viewer"
+                                android:layout_marginTop="20dp"
+                                android:text="Country Name"/>
+
+                        </RelativeLayout>
+
+                    </RelativeLayout>
+
+
+
+
+
+
+
+                    <android.support.v7.widget.CardView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="25dp"
+                        app:cardElevation="5dp"
+                        android:layout_below="@+id/textholders"
+                        android:layout_marginTop="50dp"
+                        android:id="@+id/contentHolders"
+                        android:layout_marginRight="25dp">
+
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+
+
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+                                android:id="@+id/rel1">
+
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/textContainer"
+                                    android:layout_centerVertical="true"
+                                    android:layout_marginLeft="10dp">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:id="@+id/descHolder"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="13dp"
+                                        android:textColor="#000"
+                                        android:text="Some fancy important thing"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_below="@+id/descHolder"
+                                        android:textSize="11dp"
+                                        android:text="AUD"/>
+
+                                </RelativeLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/value"
+                                    android:text="$150,000,000,000"
+                                    android:textSize="11dp"
+                                    android:layout_centerVertical="true"
+                                    android:paddingTop="15dp"
+                                    android:layout_alignParentRight="true"
+                                    android:layout_marginRight="10dp"/>
+
+
+                            </RelativeLayout>
+
+
+
+
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+                                android:id="@+id/rel2"
+                                android:layout_below="@+id/rel1">
+
+
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@id/textContainer"
+                                    android:layout_centerVertical="true"
+                                    android:layout_marginLeft="10dp">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:id="@id/descHolder"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="13dp"
+                                        android:textColor="#000"
+                                        android:text="Another important thing"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_below="@+id/descHolder"
+                                        android:textSize="11dp"
+                                        android:text="AUD"/>
+
+                                </RelativeLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@id/value"
+                                    android:text="$15"
+                                    android:textSize="11dp"
+                                    android:layout_centerVertical="true"
+                                    android:paddingTop="15dp"
+                                    android:layout_alignParentRight="true"
+                                    android:layout_marginRight="10dp"/>
+
+
+
+
+                            </RelativeLayout>
+
+
+
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+                                android:layout_below="@+id/rel2">
+
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@id/textContainer"
+                                    android:layout_centerVertical="true"
+                                    android:layout_marginLeft="10dp">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:id="@id/descHolder"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="13dp"
+                                        android:textColor="#000"
+                                        android:text="Another important thing"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_below="@+id/descHolder"
+                                        android:textSize="11dp"
+                                        android:text="AUD"/>
+
+                                </RelativeLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@id/value"
+                                    android:text="$150,000"
+                                    android:textSize="11dp"
+                                    android:layout_centerVertical="true"
+                                    android:paddingTop="15dp"
+                                    android:layout_alignParentRight="true"
+                                    android:layout_marginRight="10dp"/>
+
+
+
+                            </RelativeLayout>
+
+
+
+
+
+                        </RelativeLayout>
+
+
+                    </android.support.v7.widget.CardView>
+
+
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/contentHolders"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="30dp"
+                    android:id="@+id/buttonHolders">
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CLOSE"
+                        android:id="@+id/closePopup"
+                        android:textStyle="bold"
+                        android:stateListAnimator="@null"
+                        android:background="@drawable/ripple_button"
+                        android:textColor="@color/primary" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="EXPAND"
+                        android:id="@+id/expandPopup"
+                        android:background="@drawable/ripple_button"
+                        android:layout_marginLeft="20dp"
+                        android:textStyle="bold"
+                        android:stateListAnimator="@null"
+                        android:textColor="@color/primary"
+                        android:layout_toRightOf="@+id/closePopup"/>
+
+
+                </RelativeLayout>
+
+                </RelativeLayout>
+            </ScrollView>
+
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <com.aurelhubert.ahbottomnavigation.AHBottomNavigation
         android:id="@+id/bottom_navigation"
@@ -79,5 +426,11 @@
         android:layout_height="wrap_content"
         android:background="#fff"
         android:layout_gravity="bottom"/>
+
+    <FrameLayout
+        android:id="@+id/frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>

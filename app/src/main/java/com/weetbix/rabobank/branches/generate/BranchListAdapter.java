@@ -1,13 +1,22 @@
 package com.weetbix.rabobank.branches.generate;
 
+import android.animation.ValueAnimator;
+import android.app.Activity;
+import android.content.Context;
+import android.support.design.internal.NavigationMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.weetbix.rabobank.R;
+import com.weetbix.rabobank.all_branches;
 
 import java.util.List;
 
@@ -58,6 +67,7 @@ public class BranchListAdapter extends RecyclerView.Adapter<BranchListAdapter.br
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.branch_list_element, parent, false);
 
+
         return new branch_holder(v);
     }
 
@@ -67,6 +77,15 @@ public class BranchListAdapter extends RecyclerView.Adapter<BranchListAdapter.br
         holder.initialHolder.setText(new String(new char[]{branch.name.charAt(0)}));
         holder.branchName.setText(branch.name);
         holder.countryName.setText(branch.country);
+
+        // Attain the hider class
+
+
+        // Attain the bottom nav bar
+        //final AHBottomNavigation nav = (AHBottomNavigation)  mainView.findViewById(R.id.bottom_navigation);
+
+
+
     }
 
     @Override
