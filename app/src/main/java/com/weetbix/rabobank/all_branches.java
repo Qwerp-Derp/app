@@ -96,7 +96,7 @@ public class all_branches extends AppCompatActivity implements NavigationView.On
         // Load the branches through a http req
         // Ideally this will change to an actual domain name on a vps and not hosted locally
         try {
-            String res = sendGet("http://10.0.2.2:8080/branches/get");
+            String res = sendGet("http://35.201.8.34:8080/branches/get");
             // Parse the json
             JSON json = new JSON(res);
             // Begin reading it
